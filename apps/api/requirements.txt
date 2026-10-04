@@ -1,0 +1,22 @@
+fastapi
+uvicorn
+sqlalchemy[asyncio]
+asyncpg
+aiosqlite
+pydantic
+pydantic-settings
+email-validator
+alembic
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==4.0.1
+python-multipart
+sendgrid
+bleach
+slowapi
+dnspython
+cryptography
+# tests
+pytest
+pytest-asyncio
+httpx
