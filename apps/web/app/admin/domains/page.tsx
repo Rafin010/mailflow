@@ -20,6 +20,9 @@ export default function Domains() {
   const [newDomain, setNewDomain] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verifyDomain, setVerifyDomain] = useState<Domain | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
 
   useEffect(() => {
     loadDomains();
@@ -162,14 +165,14 @@ export default function Domains() {
                       <CheckCircle2 className="h-3.5 w-3.5" /> Configured
                     </span>
                   ) : (
-                    <button className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors">
+                    <button onClick={() => setVerifyDomain(domain)} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors">
                       <ShieldAlert className="h-3.5 w-3.5" /> Setup Required
                     </button>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   {!domain.is_verified ? (
-                    <button className="text-blue-600 hover:text-blue-900 flex items-center justify-end gap-1 w-full font-semibold">
+                    <button onClick={() => setVerifyDomain(domain)} className="text-blue-600 hover:text-blue-900 flex items-center justify-end gap-1 w-full font-semibold">
                       Verify <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
@@ -191,6 +194,128 @@ export default function Domains() {
           </div>
         )}
       </div>
+
+      {verifyDomain && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden animate-page-in flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Verify & Setup: {verifyDomain.domain_name}</h3>
+                <p className="text-sm text-gray-500">Add these DNS records to your DNS provider (e.g. Cloudflare, GoDaddy).</p>
+              </div>
+              <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-8">
+              {verifyError && (
+                <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm border border-red-100 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" /> {verifyError}
+                </div>
+              )}
+
+              {/* 1. Domain Verification */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 
+                  Domain Verification
+                </h4>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="min-w-full text-sm text-left">
+                    <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
+                      <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Content</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
+                      <tr>
+                        <td className="px-4 py-3">TXT</td>
+                        <td className="px-4 py-3">@</td>
+                        <td className="px-4 py-3">mailflow-verification={verifyDomain.id}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              {/* 2. Mail Routing (MX) */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> 
+                  Email Routing (MX Records)
+                </h4>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="min-w-full text-sm text-left">
+                    <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
+                      <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Mail Server</th><th className="px-4 py-2 font-medium">Priority</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
+                      <tr>
+                        <td className="px-4 py-3">MX</td>
+                        <td className="px-4 py-3">@</td>
+                        <td className="px-4 py-3">mx.mailflow.dev</td>
+                        <td className="px-4 py-3">10</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              {/* 3. Spam Protection (SPF & DKIM) */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> 
+                  Spam Protection (SPF & DKIM)
+                </h4>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="min-w-full text-sm text-left">
+                    <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
+                      <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Content</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
+                      <tr>
+                        <td className="px-4 py-3">TXT</td>
+                        <td className="px-4 py-3">@</td>
+                        <td className="px-4 py-3">v=spf1 include:_spf.mailflow.dev ~all</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3">TXT</td>
+                        <td className="px-4 py-3">mailflow._domainkey</td>
+                        <td className="px-4 py-3 break-all">v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0 flex justify-end gap-3">
+              <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 border border-gray-300 rounded transition-colors">
+                Close
+              </button>
+              <button 
+                onClick={async () => {
+                  setVerifying(true); setVerifyError("");
+                  try {
+                    await fetchApi(`/api/admin/v1/domains/${verifyDomain.id}/verify`, { method: "POST" });
+                    setVerifyDomain(null);
+                    loadDomains();
+                  } catch (err: any) {
+                    setVerifyError(err.message || "DNS records not detected yet. DNS propagation may take up to 24 hours.");
+                  } finally {
+                    setVerifying(false);
+                  }
+                }}
+                disabled={verifying} 
+                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {verifying && <Loader2 className="w-4 h-4 animate-spin" />}
+                {verifying ? "Verifying..." : "Verify Now"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
