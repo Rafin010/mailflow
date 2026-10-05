@@ -24,32 +24,90 @@ const mockUsers: UserData[] = [
 export default function Users() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [domains, setDomains] = useState<any[]>([]);
+
+  // Form states
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [selectedDomain, setSelectedDomain] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("member");
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchApi('/api/admin/v1/users');
+      if (response && response.items) {
+        setUsers(response.items.map((u: any) => ({
+          id: u.id,
+          name: u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || 'Unknown User',
+          email: u.email,
+          status: u.status === 'active' ? 'Active' : 'Inactive',
+          role: u.role,
+          lastLogin: u.created_at || 'Never'
+        })));
+      } else {
+        setUsers(mockUsers);
+      }
+    } catch (err) {
+      setUsers(mockUsers);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadUsers = async () => {
+    loadUsers();
+    
+    // Load domains for the dropdown
+    const loadDomains = async () => {
       try {
-        const response = await fetchApi('/api/admin/v1/users');
-        if (response && response.items) {
-          setUsers(response.items.map((u: any) => ({
-            id: u.id,
-            name: u.display_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || 'Unknown User',
-            email: u.email,
-            status: u.status === 'active' ? 'Active' : 'Inactive',
-            role: u.role,
-            lastLogin: u.created_at || 'Never'
-          })));
+        const domRes = await fetchApi('/api/admin/v1/domains');
+        if (domRes && domRes.items && domRes.items.length > 0) {
+          setDomains(domRes.items);
+          setSelectedDomain(domRes.items[0].name);
         } else {
-          setUsers(mockUsers);
+          setDomains([{ id: 'mock', name: 'mailflow.dev' }]);
+          setSelectedDomain('mailflow.dev');
         }
       } catch (err) {
-        setUsers(mockUsers);
-      } finally {
-        setLoading(false);
+        setDomains([{ id: 'mock', name: 'mailflow.dev' }]);
+        setSelectedDomain('mailflow.dev');
       }
     };
-    loadUsers();
+    loadDomains();
   }, []);
 
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setErrorMsg("");
+    try {
+      const email = `${username}@${selectedDomain}`;
+      await fetchApi('/api/admin/v1/users', {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          first_name: firstName,
+          last_name: lastName,
+          password: password,
+          role: role,
+        }),
+      });
+      setIsModalOpen(false);
+      setFirstName(""); setLastName(""); setUsername(""); setPassword("");
+      await loadUsers();
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to add user");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+        const response = await fetchApi('/api/admin/v1/users');
   return (
     <div className="bg-white rounded border border-gray-200">
       <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -66,7 +124,7 @@ export default function Users() {
               className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          <button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+          <button onClick={() => setIsModalOpen(true)} className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
             <Plus className="w-4 h-4" />
             <span>Add User</span>
           </button>
@@ -120,6 +178,71 @@ export default function Users() {
           </table>
         )}
       </div>
+
+      {/* Add User Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-page-in">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-900">Add User</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form onSubmit={handleAddUser} className="p-6 space-y-4">
+              {errorMsg && <div className="p-3 text-sm text-red-600 bg-red-50 rounded border border-red-100">{errorMsg}</div>}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input required type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <div className="flex border border-gray-300 rounded overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
+                  <input required type="text" value={username} onChange={e => setUsername(e.target.value.replace(/[^a-zA-Z0-9.-_]/g, ''))} className="flex-1 px-3 py-2 text-sm focus:outline-none" placeholder="username" />
+                  <div className="bg-gray-50 border-l border-gray-300 px-3 flex items-center">
+                    <span className="text-gray-500 text-sm">@</span>
+                    <select value={selectedDomain} onChange={e => setSelectedDomain(e.target.value)} className="bg-transparent text-sm text-gray-700 focus:outline-none pl-1">
+                      {domains.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="Minimum 8 characters" minLength={8} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select value={role} onChange={e => setRole(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="member">User</option>
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 border border-gray-300 rounded transition-colors">Cancel</button>
+                <button type="submit" disabled={submitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors disabled:opacity-50">
+                  {submitting ? "Adding..." : "Add User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+      {/* Add User Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-fade-in-up">
