@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Globe, CheckCircle2, AlertTriangle, MoreVertical, X, ShieldAlert, ArrowRight, Loader2 } from "lucide-react";
+import { Plus, Globe, CheckCircle2, AlertTriangle, MoreVertical, X, ShieldAlert, ArrowRight, Loader2, Copy, Check } from "lucide-react";
 import { fetchApi } from "@/lib/api";
 
 interface Domain {
@@ -23,6 +23,13 @@ export default function Domains() {
   const [verifyDomain, setVerifyDomain] = useState<Domain | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState("");
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    setTimeout(() => setCopiedText(null), 2000);
+  };
 
   useEffect(() => {
     loadDomains();
@@ -227,10 +234,15 @@ export default function Domains() {
                       <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Content</th></tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
-                      <tr>
+                      <tr className="group">
                         <td className="px-4 py-3">TXT</td>
                         <td className="px-4 py-3">@</td>
-                        <td className="px-4 py-3">mailflow-verification={verifyDomain.id}</td>
+                        <td className="px-4 py-3 flex items-center justify-between gap-4">
+                          <span>mailflow-verification={verifyDomain.id}</span>
+                          <button onClick={() => handleCopy(`mailflow-verification=${verifyDomain.id}`)} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                            {copiedText === `mailflow-verification=${verifyDomain.id}` ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                          </button>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -249,10 +261,15 @@ export default function Domains() {
                       <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Mail Server</th><th className="px-4 py-2 font-medium">Priority</th></tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
-                      <tr>
+                      <tr className="group">
                         <td className="px-4 py-3">MX</td>
                         <td className="px-4 py-3">@</td>
-                        <td className="px-4 py-3">mx.mailflow.dev</td>
+                        <td className="px-4 py-3 flex items-center justify-between gap-4">
+                          <span>mx.mailflow.dev</span>
+                          <button onClick={() => handleCopy("mx.mailflow.dev")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                            {copiedText === "mx.mailflow.dev" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                          </button>
+                        </td>
                         <td className="px-4 py-3">10</td>
                       </tr>
                     </tbody>
@@ -272,15 +289,30 @@ export default function Domains() {
                       <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Content</th></tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
-                      <tr>
+                      <tr className="group">
                         <td className="px-4 py-3">TXT</td>
                         <td className="px-4 py-3">@</td>
-                        <td className="px-4 py-3">v=spf1 include:_spf.mailflow.dev ~all</td>
+                        <td className="px-4 py-3 flex items-center justify-between gap-4">
+                          <span>v=spf1 include:_spf.mailflow.dev ~all</span>
+                          <button onClick={() => handleCopy("v=spf1 include:_spf.mailflow.dev ~all")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                            {copiedText === "v=spf1 include:_spf.mailflow.dev ~all" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                          </button>
+                        </td>
                       </tr>
-                      <tr>
+                      <tr className="group">
                         <td className="px-4 py-3">TXT</td>
-                        <td className="px-4 py-3">mailflow._domainkey</td>
-                        <td className="px-4 py-3 break-all">v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...</td>
+                        <td className="px-4 py-3 flex items-center justify-between gap-4">
+                          <span>mailflow._domainkey</span>
+                          <button onClick={() => handleCopy("mailflow._domainkey")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                            {copiedText === "mailflow._domainkey" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 flex items-center justify-between gap-4">
+                          <span className="break-all">v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...</span>
+                          <button onClick={() => handleCopy("v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...")} className="text-gray-400 hover:text-gray-600 transition-colors shrink-0" title="Copy">
+                            {copiedText === "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1..." ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                          </button>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
