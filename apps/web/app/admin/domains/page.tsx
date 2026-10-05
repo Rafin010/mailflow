@@ -71,6 +71,153 @@ export default function Domains() {
     return <div className="p-8 text-center text-gray-500">Loading domains...</div>;
   }
 
+  if (verifyDomain) {
+    return (
+      <div className="animate-fade-in w-full max-w-5xl mx-auto pb-12">
+        <div className="mb-6 flex items-center gap-4">
+          <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="text-gray-500 hover:text-gray-900 transition-colors bg-white border border-gray-200 rounded-md p-2 shadow-sm hover:bg-gray-50">
+            <ArrowRight className="h-5 w-5 rotate-180" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Verify & Setup: {verifyDomain.domain_name}</h1>
+            <p className="text-sm text-gray-500 mt-1">Add these DNS records to your DNS provider (e.g. Cloudflare, GoDaddy).</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-8 space-y-10">
+            {verifyError && (
+              <div className="bg-red-50 text-red-700 p-4 rounded-md text-sm border border-red-100 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 shrink-0" /> {verifyError}
+              </div>
+            )}
+
+            {/* 1. Domain Verification */}
+            <section>
+              <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 
+                Domain Verification
+              </h4>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                <table className="min-w-full text-sm text-left">
+                  <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
+                    <tr><th className="px-5 py-3 font-medium">Type</th><th className="px-5 py-3 font-medium">Name / Host</th><th className="px-5 py-3 font-medium">Value / Content</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
+                    <tr className="group">
+                      <td className="px-5 py-4">TXT</td>
+                      <td className="px-5 py-4">@</td>
+                      <td className="px-5 py-4 flex items-center justify-between gap-4">
+                        <span>mailflow-verification={verifyDomain.id}</span>
+                        <button onClick={() => handleCopy("mailflow-verification=" + verifyDomain.id)} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                          {copiedText === "mailflow-verification=" + verifyDomain.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {/* 2. Mail Routing (MX) */}
+            <section>
+              <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> 
+                Email Routing (MX Records)
+              </h4>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                <table className="min-w-full text-sm text-left">
+                  <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
+                    <tr><th className="px-5 py-3 font-medium">Type</th><th className="px-5 py-3 font-medium">Name / Host</th><th className="px-5 py-3 font-medium">Value / Mail Server</th><th className="px-5 py-3 font-medium">Priority</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
+                    <tr className="group">
+                      <td className="px-5 py-4">MX</td>
+                      <td className="px-5 py-4">@</td>
+                      <td className="px-5 py-4 flex items-center justify-between gap-4">
+                        <span>mx.mailflow.dev</span>
+                        <button onClick={() => handleCopy("mx.mailflow.dev")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                          {copiedText === "mx.mailflow.dev" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td className="px-5 py-4">10</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {/* 3. Spam Protection (SPF & DKIM) */}
+            <section>
+              <h4 className="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> 
+                Spam Protection (SPF & DKIM)
+              </h4>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
+                <table className="min-w-full text-sm text-left">
+                  <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
+                    <tr><th className="px-5 py-3 font-medium">Type</th><th className="px-5 py-3 font-medium">Name / Host</th><th className="px-5 py-3 font-medium">Value / Content</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
+                    <tr className="group">
+                      <td className="px-5 py-4">TXT</td>
+                      <td className="px-5 py-4">@</td>
+                      <td className="px-5 py-4 flex items-center justify-between gap-4">
+                        <span>v=spf1 include:_spf.mailflow.dev ~all</span>
+                        <button onClick={() => handleCopy("v=spf1 include:_spf.mailflow.dev ~all")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                          {copiedText === "v=spf1 include:_spf.mailflow.dev ~all" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </td>
+                    </tr>
+                    <tr className="group">
+                      <td className="px-5 py-4">TXT</td>
+                      <td className="px-5 py-4 flex items-center justify-between gap-4">
+                        <span>mailflow._domainkey</span>
+                        <button onClick={() => handleCopy("mailflow._domainkey")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
+                          {copiedText === "mailflow._domainkey" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </td>
+                      <td className="px-5 py-4 flex items-center justify-between gap-4">
+                        <span className="break-all">v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...</span>
+                        <button onClick={() => handleCopy("v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...")} className="text-gray-400 hover:text-gray-600 transition-colors shrink-0" title="Copy">
+                          {copiedText === "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1..." ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <div className="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+            <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 bg-white border border-gray-300 rounded-md transition-colors shadow-sm">
+              I'll do this later
+            </button>
+            <button 
+              onClick={async () => {
+                setVerifying(true); setVerifyError("");
+                try {
+                  await fetchApi(/api/admin/v1/domains/ + verifyDomain.id + /verify, { method: "POST" });
+                  setVerifyDomain(null);
+                  loadDomains();
+                } catch (err: any) {
+                  setVerifyError(err.message || "DNS records not detected yet. DNS propagation may take up to 24 hours.");
+                } finally {
+                  setVerifying(false);
+                }
+              }}
+              disabled={verifying} 
+              className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+            >
+              {verifying ? "Verifying..." : "Done"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-fade-in w-full">
       <div className="flex items-center justify-between mb-8">
@@ -202,152 +349,8 @@ export default function Domains() {
         )}
       </div>
 
-      {verifyDomain && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Verify & Setup: {verifyDomain.domain_name}</h3>
-                <p className="text-sm text-gray-500">Add these DNS records to your DNS provider (e.g. Cloudflare, GoDaddy).</p>
-              </div>
-              <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="text-gray-400 hover:text-gray-600">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto space-y-8">
-              {verifyError && (
-                <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm border border-red-100 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" /> {verifyError}
-                </div>
-              )}
-
-              {/* 1. Domain Verification */}
-              <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 
-                  Domain Verification
-                </h4>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="min-w-full text-sm text-left">
-                    <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
-                      <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Content</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
-                      <tr className="group">
-                        <td className="px-4 py-3">TXT</td>
-                        <td className="px-4 py-3">@</td>
-                        <td className="px-4 py-3 flex items-center justify-between gap-4">
-                          <span>mailflow-verification={verifyDomain.id}</span>
-                          <button onClick={() => handleCopy(`mailflow-verification=${verifyDomain.id}`)} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
-                            {copiedText === `mailflow-verification=${verifyDomain.id}` ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              {/* 2. Mail Routing (MX) */}
-              <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> 
-                  Email Routing (MX Records)
-                </h4>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="min-w-full text-sm text-left">
-                    <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
-                      <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Mail Server</th><th className="px-4 py-2 font-medium">Priority</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
-                      <tr className="group">
-                        <td className="px-4 py-3">MX</td>
-                        <td className="px-4 py-3">@</td>
-                        <td className="px-4 py-3 flex items-center justify-between gap-4">
-                          <span>mx.mailflow.dev</span>
-                          <button onClick={() => handleCopy("mx.mailflow.dev")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
-                            {copiedText === "mx.mailflow.dev" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3">10</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              {/* 3. Spam Protection (SPF & DKIM) */}
-              <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="bg-blue-100 text-blue-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span> 
-                  Spam Protection (SPF & DKIM)
-                </h4>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="min-w-full text-sm text-left">
-                    <thead className="bg-gray-100 border-b border-gray-200 text-gray-600">
-                      <tr><th className="px-4 py-2 font-medium">Type</th><th className="px-4 py-2 font-medium">Name / Host</th><th className="px-4 py-2 font-medium">Value / Content</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 text-gray-800 font-mono text-xs">
-                      <tr className="group">
-                        <td className="px-4 py-3">TXT</td>
-                        <td className="px-4 py-3">@</td>
-                        <td className="px-4 py-3 flex items-center justify-between gap-4">
-                          <span>v=spf1 include:_spf.mailflow.dev ~all</span>
-                          <button onClick={() => handleCopy("v=spf1 include:_spf.mailflow.dev ~all")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
-                            {copiedText === "v=spf1 include:_spf.mailflow.dev ~all" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="group">
-                        <td className="px-4 py-3">TXT</td>
-                        <td className="px-4 py-3 flex items-center justify-between gap-4">
-                          <span>mailflow._domainkey</span>
-                          <button onClick={() => handleCopy("mailflow._domainkey")} className="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
-                            {copiedText === "mailflow._domainkey" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 flex items-center justify-between gap-4">
-                          <span className="break-all">v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...</span>
-                          <button onClick={() => handleCopy("v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1...")} className="text-gray-400 hover:text-gray-600 transition-colors shrink-0" title="Copy">
-                            {copiedText === "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1..." ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 shrink-0 flex justify-end gap-3">
-              <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 border border-gray-300 rounded transition-colors">
-                Close
-              </button>
-              <button 
-                onClick={async () => {
-                  setVerifying(true); setVerifyError("");
-                  try {
-                    await fetchApi(`/api/admin/v1/domains/${verifyDomain.id}/verify`, { method: "POST" });
-                    setVerifyDomain(null);
-                    loadDomains();
-                  } catch (err: any) {
-                    setVerifyError(err.message || "DNS records not detected yet. DNS propagation may take up to 24 hours.");
-                  } finally {
-                    setVerifying(false);
-                  }
-                }}
-                disabled={verifying} 
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                {verifying && <Loader2 className="w-4 h-4 animate-spin" />}
-                {verifying ? "Verifying..." : "Verify Now"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
+
