@@ -226,58 +226,89 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* Pricing Section with Unique Illustration */}
-      <section id="pricing" className="relative z-10 py-32 px-6 bg-gray-50 border-t border-gray-200 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                Simple, transparent <span className="text-blue-600">pricing.</span>
-              </h2>
-              <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-                Whether you're a startup or a global enterprise, we have a plan tailored to your needs. Get premium features without the premium price tag.
-              </p>
-              
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-xl border border-blue-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow cursor-pointer">
-                  <div className="absolute top-0 right-0 w-2 h-full bg-blue-600 group-hover:w-3 transition-all"></div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Professional Plan</h3>
-                  <div className="text-3xl font-extrabold text-blue-600 mb-3">$6<span className="text-lg text-gray-400 font-medium">/user/month</span></div>
-                  <p className="text-sm text-gray-500">Perfect for growing teams requiring advanced security and custom domains.</p>
-                </div>
-                
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">Enterprise Plan</h3>
-                  <div className="text-xl font-extrabold text-gray-700 mb-3">Custom Pricing</div>
-                  <p className="text-sm text-gray-500">For large organizations needing dedicated support and isolated infrastructure.</p>
-                </div>
-              </div>
-            </motion.div>
+      {/* Pricing Section */}
+      <section id="pricing" className="relative z-10 py-32 px-6 bg-white border-t border-gray-200 overflow-hidden">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Premium email. <span className="text-blue-600">Unbeatable price.</span>
+            </h2>
+            <p className="text-xl text-gray-500">
+              Get the same enterprise-grade security and reliability as Zoho and Google Workspace, but at a fraction of the cost.
+            </p>
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
-              whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-              className="relative"
-            >
-              {/* Decorative background blob */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-100 rounded-full blur-3xl opacity-50 -z-10"></div>
-              
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/50 bg-white p-2">
-                <img 
-                  src="/pricing-illustration.jpg" 
-                  alt="Pricing Tiers 3D Illustration" 
-                  className="w-full h-auto rounded-xl object-cover"
-                />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            
+            {/* Free Tier */}
+            <div className="bg-gray-50 rounded-2xl border border-gray-200 p-8 flex flex-col hover:shadow-lg transition-shadow">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
+                <p className="text-gray-500 min-h-[48px]">Perfect for personal projects and very small teams.</p>
               </div>
-            </motion.div>
+              <div className="mb-6">
+                <span className="text-5xl font-extrabold text-gray-900">$0</span>
+                <span className="text-gray-500">/user/month</span>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                {["Up to 5 Users", "5GB Storage per user", "Webmail Access Only", "Standard Security", "Community Support"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-700">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" /> {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="w-full block text-center bg-white border-2 border-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:border-gray-300 hover:bg-gray-50 transition-all">
+                Get Started
+              </Link>
+            </div>
+
+            {/* Basic Tier (Highlighted) */}
+            <div className="bg-blue-600 rounded-2xl border border-blue-600 p-8 flex flex-col shadow-2xl relative transform md:-translate-y-4">
+              <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-wider">
+                Most Popular
+              </div>
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Basic</h3>
+                <p className="text-blue-200 min-h-[48px]">Everything you need to run your business professionally.</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-5xl font-extrabold text-white">$0.80</span>
+                <span className="text-blue-200">/user/month</span>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                {["Unlimited Users", "25GB Storage per user", "Custom Domain Hosting", "IMAP / POP / SMTP Access", "Priority 24/7 Support"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-white">
+                    <CheckCircle2 className="w-5 h-5 text-blue-300 shrink-0" /> {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="w-full block text-center bg-white text-blue-600 py-3 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-md">
+                Start 15-Day Trial
+              </Link>
+            </div>
+
+            {/* Pro Tier */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 flex flex-col hover:shadow-lg transition-shadow shadow-sm">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Professional</h3>
+                <p className="text-gray-500 min-h-[48px]">Advanced compliance and vast storage for power users.</p>
+              </div>
+              <div className="mb-6">
+                <span className="text-5xl font-extrabold text-gray-900">$2.50</span>
+                <span className="text-gray-500">/user/month</span>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                {["100GB Storage per user", "eDiscovery & Archiving", "Advanced Threat Protection", "Huge 1GB Attachments", "Dedicated Account Manager"].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-700">
+                    <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0" /> {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="w-full block text-center bg-white border-2 border-blue-600 text-blue-600 py-3 rounded-lg font-bold hover:bg-blue-50 transition-all">
+                Contact Sales
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>

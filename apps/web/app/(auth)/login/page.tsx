@@ -6,12 +6,14 @@ import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
 import Image from "next/image";
 import { Orbitron } from 'next/font/google';
+import { Eye, EyeOff } from "lucide-react";
 
 const orbitron = Orbitron({ subsets: ['latin'], weight: '800' });
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -33,7 +35,8 @@ export default function LoginPage() {
       });
 
       if (!res.ok) {
-        throw new Error("Invalid email or password");
+        const errData = await res.json();
+        throw new Error(errData.detail || "Invalid email or password");
       }
 
       const data = await res.json();
@@ -50,7 +53,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex justify-center items-center gap-2 mb-8">
-          <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} />
+          <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} style={{ width: "auto", height: "auto" }} />
           <span className={`${orbitron.className} text-2xl tracking-tight text-blue-600`}>MailFlow</span>
         </Link>
       </div>
@@ -82,17 +85,24 @@ export default function LoginPage() {
               />
             </div>
 
-            <div>
+            <div className="relative">
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                className="appearance-none block w-full px-4 py-3 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
               />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
             </div>
 
             <div className="flex items-center justify-between">

@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
 import Image from "next/image";
 import { Orbitron } from 'next/font/google';
-import { CheckCircle2, ShieldCheck, Zap, Globe } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Zap, Globe, Eye, EyeOff } from "lucide-react";
 
 const orbitron = Orbitron({ subsets: ['latin'], weight: '800' });
 
@@ -15,15 +15,30 @@ export default function SignupPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
+  const validatePassword = (pwd: string) => {
+    if (pwd.length < 8) return "Password must be at least 8 characters long.";
+    const weakPasswords = ["12345678", "password", "qwertyui", "123456789"];
+    if (weakPasswords.includes(pwd.toLowerCase())) return "Please choose a stronger password.";
+    return null;
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const pwdError = validatePassword(password);
+    if (pwdError) {
+      setError(pwdError);
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("http://localhost:8000/api/v1/auth/register", {
@@ -74,7 +89,7 @@ export default function SignupPage() {
         
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-2 mb-16">
-            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={36} height={36} className="brightness-0 invert" />
+            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={36} height={36} className="brightness-0 invert" style={{ width: "auto", height: "auto" }} />
             <span className={`${orbitron.className} text-3xl tracking-tight text-white`}>MailFlow</span>
           </Link>
 
@@ -121,7 +136,7 @@ export default function SignupPage() {
           
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-2 mb-10">
-            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} />
+            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} style={{ width: "auto", height: "auto" }} />
             <span className={`${orbitron.className} text-2xl tracking-tight text-blue-600`}>MailFlow</span>
           </div>
 
@@ -173,13 +188,22 @@ export default function SignupPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-start mt-4">

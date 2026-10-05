@@ -79,15 +79,43 @@ async def signup(body: SignupRequest, request: Request, db: AsyncSession = Depen
     return _token_response(user)
 
 
+failed_attempts = {}
+
 @router.post("/login")
 async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends(get_db)):
     email = body.email.lower()
+    now = datetime.utcnow()
+    
+    # Check rate limit
+    if email in failed_attempts:
+        attempts, lock_until = failed_attempts[email]
+        if lock_until and now < lock_until:
+            remaining = int((lock_until - now).total_seconds())
+            raise HTTPException(status_code=429, detail=f"Too many failed attempts. Try again in {remaining}s.")
+        elif lock_until and now >= lock_until:
+            del failed_attempts[email]
+            
     user = (await db.execute(select(User).where(User.email == email))).scalars().first()
     if not user or not verify_password(body.password, user.hashed_password):
+        # Register failed attempt
+        attempts, _ = failed_attempts.get(email, (0, None))
+        attempts += 1
+        if attempts >= 3:
+            from datetime import timedelta
+            lock_until = now + timedelta(seconds=60)
+            failed_attempts[email] = (attempts, lock_until)
+        else:
+            failed_attempts[email] = (attempts, None)
+            
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+        
+    # Reset on success
+    if email in failed_attempts:
+        del failed_attempts[email]
+        
     if user.status == UserStatus.SUSPENDED:
         raise HTTPException(status_code=403, detail="Your account has been suspended. Contact your administrator.")
-    user.last_login_at = datetime.utcnow()
+    user.last_login_at = now
     log_action(db, user, "auth.login", target_type="user", target_id=user.id, target_label=user.email, request=request)
     await db.commit()
     await db.refresh(user)
