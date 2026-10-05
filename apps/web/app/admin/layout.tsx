@@ -46,8 +46,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
       
       {/* Admin Sidebar */}
-      <div className="w-64 bg-slate-900 flex flex-col">
-        <div className="px-6 py-4 flex items-center h-16">
+      <div className="w-64 bg-slate-900 flex flex-col shrink-0">
+        <div className="px-6 py-4 flex items-center h-16 shrink-0">
           <Link href="/admin" className="flex items-center gap-2">
             <Image src="/logo.svg" alt="MailFlow Logo" width={28} height={28} priority className="object-contain brightness-0 invert" />
             <div className="flex flex-col">
