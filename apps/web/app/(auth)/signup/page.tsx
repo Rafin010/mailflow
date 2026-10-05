@@ -58,20 +58,9 @@ export default function SignupPage() {
         throw new Error(err.detail || "Signup failed");
       }
 
-      // Automatically log them in by fetching the token
-      const loginRes = await fetch("http://localhost:8000/api/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, password: password }),
-      });
-
-      if (loginRes.ok) {
-        const data = await loginRes.json();
-        localStorage.setItem("token", data.access_token);
-        login(data.user);
-      } else {
-        router.push("/login");
-      }
+      // Signup endpoint already returns a token — log straight in
+      const data = await res.json();
+      login(data.access_token, data.user);
     } catch (err: any) {
       setError(err.message);
       setLoading(false);

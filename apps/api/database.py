@@ -2,7 +2,8 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./mailflow.db")
+_DEFAULT_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mailflow.db").replace("\\", "/")
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{_DEFAULT_DB}")
 
 # Create Async Engine (SQLite needs check_same_thread=False for async/await concurrency if used wrongly, but aiosqlite handles it)
 # We need to disable Postgres specific pool settings if we use sqlite

@@ -40,9 +40,7 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      localStorage.setItem("token", data.access_token);
-      
-      login(data.user);
+      login(data.access_token, data.user);
     } catch (err: any) {
       setError(err.message);
       setLoading(false);
