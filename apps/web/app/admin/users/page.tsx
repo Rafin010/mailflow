@@ -181,10 +181,8 @@ export default function Users() {
 
       {/* Add User Slide-over */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-gray-900/40 transition-opacity" onClick={() => setIsModalOpen(false)}></div>
-          <div className="fixed inset-y-0 right-0 max-w-md w-full flex">
-            <div className="w-full h-full bg-white shadow-2xl flex flex-col animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
               <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Add User</h3>
@@ -255,7 +253,6 @@ export default function Users() {
                 </button>
               </div>
             </div>
-          </div>
         </div>
       )}
     </div>
