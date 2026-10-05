@@ -53,7 +53,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex justify-center items-center gap-2 mb-8">
-          <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} style={{ width: "auto", height: "auto" }} />
+          <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} className="w-8 h-8" />
           <span className={`${orbitron.className} text-2xl tracking-tight text-blue-600`}>MailFlow</span>
         </Link>
       </div>

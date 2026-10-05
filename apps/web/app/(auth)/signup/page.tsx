@@ -89,7 +89,7 @@ export default function SignupPage() {
         
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-2 mb-16">
-            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={36} height={36} className="brightness-0 invert" style={{ width: "auto", height: "auto" }} />
+            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={36} height={36} className="brightness-0 invert w-9 h-9" />
             <span className={`${orbitron.className} text-3xl tracking-tight text-white`}>MailFlow</span>
           </Link>
 
@@ -136,7 +136,7 @@ export default function SignupPage() {
           
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-2 mb-10">
-            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} style={{ width: "auto", height: "auto" }} />
+            <Image src="/Browser_icon.svg" alt="MailFlow Logo" width={32} height={32} className="w-8 h-8" />
             <span className={`${orbitron.className} text-2xl tracking-tight text-blue-600`}>MailFlow</span>
           </div>
 
