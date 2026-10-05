@@ -198,7 +198,7 @@ export default function Domains() {
               onClick={async () => {
                 setVerifying(true); setVerifyError("");
                 try {
-                  await fetchApi(/api/admin/v1/domains/ + verifyDomain.id + /verify, { method: "POST" });
+                  await fetchApi(`/api/admin/v1/domains/${verifyDomain.id}/verify`, { method: "POST" });
                   setVerifyDomain(null);
                   loadDomains();
                 } catch (err: any) {
