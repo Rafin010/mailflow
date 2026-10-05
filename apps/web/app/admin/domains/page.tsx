@@ -208,7 +208,6 @@ export default function Domains() {
               </div>
             </section>
           </div>
-          </div>
 
           <div className="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
             <button onClick={() => { setVerifyDomain(null); setVerifyError(""); }} className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 bg-white border border-gray-300 rounded-md transition-colors shadow-sm">
