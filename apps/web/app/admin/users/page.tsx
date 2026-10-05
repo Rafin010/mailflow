@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { User, Search, Plus, MoreVertical, X, AlertTriangle, Loader2 } from "lucide-react";
 
 import { fetchApi } from "@/lib/api";
@@ -25,6 +26,9 @@ export default function Users() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [domains, setDomains] = useState<any[]>([]);
 
   // Form states
@@ -180,8 +184,8 @@ export default function Users() {
       </div>
 
       {/* Add User Slide-over */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+      {isModalOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
               <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white">
                 <div>
@@ -254,7 +258,7 @@ export default function Users() {
               </div>
             </div>
         </div>
-      )}
+      ), document.body)}
     </div>
   );
 }
