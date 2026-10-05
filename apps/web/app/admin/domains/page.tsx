@@ -45,7 +45,7 @@ export default function Domains() {
     try {
       const added = await fetchApi("/api/admin/v1/domains", {
         method: "POST",
-        body: JSON.stringify({ name: newDomain.toLowerCase() }),
+        body: JSON.stringify({ domain_name: newDomain.toLowerCase() }),
       });
       setDomains([...domains, added]);
       setNewDomain("");
