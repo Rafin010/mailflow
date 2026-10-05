@@ -238,6 +238,9 @@ export default function SignupPage() {
                 Sign in
               </Link>
             </p>
+            <p className="text-xs text-gray-400 mt-6">
+              Proudly partnered with <a href="https://sportyxi.com" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 transition-colors">Sportyxi</a>
+            </p>
           </div>
         </div>
       </div>
