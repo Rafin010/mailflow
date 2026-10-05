@@ -179,62 +179,82 @@ export default function Users() {
         )}
       </div>
 
-      {/* Add User Modal */}
+      {/* Add User Slide-over */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-page-in">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 className="text-lg font-medium text-gray-900">Add User</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">&times;</button>
-            </div>
-            <form onSubmit={handleAddUser} className="p-6 space-y-4">
-              {errorMsg && <div className="p-3 text-sm text-red-600 bg-red-50 rounded border border-red-100">{errorMsg}</div>}
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-gray-900/40 transition-opacity" onClick={() => setIsModalOpen(false)}></div>
+          <div className="fixed inset-y-0 right-0 max-w-md w-full flex">
+            <div className="w-full h-full bg-white shadow-2xl flex flex-col animate-fade-in">
+              <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Add User</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">Create a new mail account for your organization</p>
+                </div>
+                <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 p-2 transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                  <input required type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                  <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                <div className="flex border border-gray-300 rounded overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
-                  <input required type="text" value={username} onChange={e => setUsername(e.target.value.replace(/[^a-zA-Z0-9.-_]/g, ''))} className="flex-1 px-3 py-2 text-sm focus:outline-none" placeholder="username" />
-                  <div className="bg-gray-50 border-l border-gray-300 px-3 flex items-center">
-                    <span className="text-gray-500 text-sm">@</span>
-                    <select value={selectedDomain} onChange={e => setSelectedDomain(e.target.value)} className="bg-transparent text-sm text-gray-700 focus:outline-none pl-1">
-                      {domains.map(d => <option key={d.id} value={d.domain_name}>{d.domain_name}</option>)}
-                    </select>
+              <div className="flex-1 overflow-y-auto">
+                <form id="add-user-form" onSubmit={handleAddUser} className="p-6 space-y-6">
+                  {errorMsg && (
+                    <div className="p-3 text-sm text-red-700 bg-red-50 rounded-md border border-red-100 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" /> {errorMsg}
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
+                      <input required type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow" placeholder="e.g. John" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name <span className="text-gray-400 font-normal">(Optional)</span></label>
+                      <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow" placeholder="e.g. Doe" />
+                    </div>
                   </div>
-                </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+                    <div className="flex border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-shadow bg-white">
+                      <input required type="text" value={username} onChange={e => setUsername(e.target.value.replace(/[^a-zA-Z0-9.-_]/g, ''))} className="flex-1 px-3 py-2.5 text-sm focus:outline-none border-none ring-0" placeholder="username" />
+                      <div className="bg-gray-50 border-l border-gray-300 px-3 flex items-center">
+                        <span className="text-gray-500 text-sm font-medium mr-1">@</span>
+                        <select value={selectedDomain} onChange={e => setSelectedDomain(e.target.value)} className="bg-transparent text-sm text-gray-700 focus:outline-none font-medium cursor-pointer">
+                          {domains.map(d => <option key={d.id} value={d.domain_name}>{d.domain_name}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1.5">This will be the user's login ID and primary email address.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                    <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow" placeholder="Minimum 8 characters" minLength={8} />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+                    <select value={role} onChange={e => setRole(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-shadow cursor-pointer bg-white">
+                      <option value="member">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="super_admin">Super Admin</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1.5">Admins can manage settings. Users only have access to their mailbox.</p>
+                  </div>
+                </form>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input required type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500" placeholder="Minimum 8 characters" minLength={8} />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select value={role} onChange={e => setRole(e.target.value)} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
-                  <option value="member">User</option>
-                  <option value="admin">Admin</option>
-                  <option value="super_admin">Super Admin</option>
-                </select>
-              </div>
-
-              <div className="pt-4 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 border border-gray-300 rounded transition-colors">Cancel</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors disabled:opacity-50">
+              <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 bg-white border border-gray-300 rounded-md transition-colors shadow-sm">
+                  Cancel
+                </button>
+                <button form="add-user-form" type="submit" disabled={submitting} className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2">
+                  {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   {submitting ? "Adding..." : "Add User"}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
