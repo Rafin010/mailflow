@@ -107,7 +107,7 @@ export default function Users() {
       setSubmitting(false);
     }
   };
-        const response = await fetchApi('/api/admin/v1/users');
+
   return (
     <div className="bg-white rounded border border-gray-200">
       <div className="flex items-center justify-between p-6 border-b border-gray-100">

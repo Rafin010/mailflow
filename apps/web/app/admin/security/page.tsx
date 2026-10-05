@@ -84,7 +84,7 @@ export default function Security() {
   };
 
   return (
-    <div className="max-w-4xl">
+    <div className="w-full">
       <div className="mb-6">
         <h2 className="text-xl font-medium text-gray-900">Security & Compliance</h2>
         <p className="text-sm text-gray-500 mt-1">Manage security policies, authentication methods, and access controls</p>

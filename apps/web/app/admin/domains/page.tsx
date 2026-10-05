@@ -62,7 +62,7 @@ export default function Domains() {
   }
 
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in w-full">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Domains</h1>
