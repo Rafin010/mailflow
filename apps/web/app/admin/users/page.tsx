@@ -69,13 +69,13 @@ export default function Users() {
         const domRes = await fetchApi('/api/admin/v1/domains');
         if (domRes && domRes.items && domRes.items.length > 0) {
           setDomains(domRes.items);
-          setSelectedDomain(domRes.items[0].name);
+          setSelectedDomain(domRes.items[0].domain_name);
         } else {
-          setDomains([{ id: 'mock', name: 'mailflow.dev' }]);
+          setDomains([{ id: 'mock', domain_name: 'mailflow.dev' }]);
           setSelectedDomain('mailflow.dev');
         }
       } catch (err) {
-        setDomains([{ id: 'mock', name: 'mailflow.dev' }]);
+        setDomains([{ id: 'mock', domain_name: 'mailflow.dev' }]);
         setSelectedDomain('mailflow.dev');
       }
     };
@@ -208,7 +208,7 @@ export default function Users() {
                   <div className="bg-gray-50 border-l border-gray-300 px-3 flex items-center">
                     <span className="text-gray-500 text-sm">@</span>
                     <select value={selectedDomain} onChange={e => setSelectedDomain(e.target.value)} className="bg-transparent text-sm text-gray-700 focus:outline-none pl-1">
-                      {domains.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                      {domains.map(d => <option key={d.id} value={d.domain_name}>{d.domain_name}</option>)}
                     </select>
                   </div>
                 </div>

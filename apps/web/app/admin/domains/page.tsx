@@ -6,7 +6,7 @@ import { fetchApi } from "@/lib/api";
 
 interface Domain {
   id: string;
-  name: string;
+  domain_name: string;
   is_verified: boolean;
   mx_status: "ok" | "missing" | "invalid";
   spf_status: "ok" | "missing" | "invalid";
@@ -142,7 +142,7 @@ export default function Domains() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <Globe className="flex-shrink-0 h-5 w-5 text-gray-400 mr-3" />
-                    <div className="text-sm font-medium text-gray-900">{domain.name}</div>
+                    <div className="text-sm font-medium text-gray-900">{domain.domain_name}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
