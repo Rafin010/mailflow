@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, memo } from "react";
 import { createPortal } from "react-dom";
 import { User, Search, Plus, MoreVertical, X, AlertTriangle, Loader2, Eye, EyeOff, ChevronDown, ChevronUp, Check, Copy, Edit, Lock, Ban, Trash2 } from "lucide-react";
 
@@ -121,6 +121,85 @@ function CustomDomainSelect({ value, onChange, domains }: { value: string, onCha
   );
 }
 
+const UserTableRow = memo(function UserTableRow({
+  user,
+  isOpen,
+  onToggle,
+  onClose
+}: {
+  user: UserData;
+  isOpen: boolean;
+  onToggle: (id: string) => void;
+  onClose: () => void;
+}) {
+  return (
+    <tr className="hover:bg-gray-50 transition-colors group">
+      <td className="px-6 py-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-medium">
+            {user.name.charAt(0)}
+          </div>
+          <span className="font-medium text-gray-900">{user.name}</span>
+        </div>
+      </td>
+      <td className="px-6 py-4">{user.email}</td>
+      <td className="px-6 py-4">{user.role}</td>
+      <td className="px-6 py-4">
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+          user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {user.status}
+        </span>
+      </td>
+      <td className="px-6 py-4 text-gray-500">{user.lastLogin}</td>
+      <td className="px-6 py-4 text-right">
+        <div className="relative inline-block text-left" data-dropdown="user-actions">
+          <button 
+            onClick={() => onToggle(user.id)}
+            className={`p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all ${isOpen ? 'opacity-100 bg-gray-100' : 'opacity-0 group-hover:opacity-100'}`}
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          
+          {isOpen && (
+            <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-200 rounded-md shadow-sm py-1 z-[50] animate-in fade-in zoom-in-95 duration-100 text-left">
+              <button 
+                onClick={onClose} 
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors group/item"
+              >
+                <Edit className="w-4 h-4 text-gray-400 group-hover/item:text-blue-600 transition-colors" />
+                <span className="group-hover/item:text-blue-600 transition-colors">Edit User</span>
+              </button>
+              <button 
+                onClick={onClose} 
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors group/item"
+              >
+                <Lock className="w-4 h-4 text-gray-400 group-hover/item:text-blue-600 transition-colors" />
+                <span className="group-hover/item:text-blue-600 transition-colors">Reset Password</span>
+              </button>
+              <button 
+                onClick={onClose} 
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors group/item"
+              >
+                <Ban className="w-4 h-4 text-gray-400 group-hover/item:text-orange-600 transition-colors" />
+                <span className="group-hover/item:text-orange-600 transition-colors">Suspend User</span>
+              </button>
+              <div className="h-px bg-gray-100 my-1"></div>
+              <button 
+                onClick={onClose} 
+                className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors group/item"
+              >
+                <Trash2 className="w-4 h-4 text-red-500 group-hover/item:text-red-700 transition-colors" />
+                <span className="group-hover/item:text-red-700 transition-colors">Delete User</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+});
+
 export default function Users() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,9 +220,13 @@ export default function Users() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleDropdown = (id: string) => {
+  const toggleDropdown = useCallback((id: string) => {
     setOpenDropdownId(prev => prev === id ? null : id);
-  };
+  }, []);
+
+  const closeDropdown = useCallback(() => {
+    setOpenDropdownId(null);
+  }, []);
 
   const [domains, setDomains] = useState<any[]>([]);
   // Form states
@@ -269,70 +352,13 @@ export default function Users() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-medium">
-                        {user.name.charAt(0)}
-                      </div>
-                      <span className="font-medium text-gray-900">{user.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">{user.role}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                      user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">{user.lastLogin}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="relative inline-block text-left" data-dropdown="user-actions">
-                      <button 
-                        onClick={() => toggleDropdown(user.id)}
-                        className={`p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all ${openDropdownId === user.id ? 'opacity-100 bg-gray-100' : 'opacity-0 group-hover:opacity-100'}`}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                      
-                      {openDropdownId === user.id && (
-                        <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-200 rounded-md shadow-sm py-1 z-[50] animate-in fade-in zoom-in-95 duration-100 text-left">
-                          <button 
-                            onClick={() => setOpenDropdownId(null)} 
-                            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors group/item"
-                          >
-                            <Edit className="w-4 h-4 text-gray-400 group-hover/item:text-blue-600 transition-colors" />
-                            <span className="group-hover/item:text-blue-600 transition-colors">Edit User</span>
-                          </button>
-                          <button 
-                            onClick={() => setOpenDropdownId(null)} 
-                            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors group/item"
-                          >
-                            <Lock className="w-4 h-4 text-gray-400 group-hover/item:text-blue-600 transition-colors" />
-                            <span className="group-hover/item:text-blue-600 transition-colors">Reset Password</span>
-                          </button>
-                          <button 
-                            onClick={() => setOpenDropdownId(null)} 
-                            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors group/item"
-                          >
-                            <Ban className="w-4 h-4 text-gray-400 group-hover/item:text-orange-600 transition-colors" />
-                            <span className="group-hover/item:text-orange-600 transition-colors">Suspend User</span>
-                          </button>
-                          <div className="h-px bg-gray-100 my-1"></div>
-                          <button 
-                            onClick={() => setOpenDropdownId(null)} 
-                            className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors group/item"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500 group-hover/item:text-red-700 transition-colors" />
-                            <span className="group-hover/item:text-red-700 transition-colors">Delete User</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                <UserTableRow
+                  key={user.id}
+                  user={user}
+                  isOpen={openDropdownId === user.id}
+                  onToggle={toggleDropdown}
+                  onClose={closeDropdown}
+                />
               ))}
             </tbody>
           </table>

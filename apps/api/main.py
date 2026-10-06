@@ -2,15 +2,12 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from .rate_limit import limiter
 from .routers import users, mailboxes, messages, auth
 from .routers import admin_domains, admin_users, admin_groups, admin_security, admin_insights
 from .database import engine, Base
-
-limiter = Limiter(key_func=get_remote_address)
-
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):

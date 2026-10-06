@@ -12,8 +12,10 @@ from ..deps import require_admin, parse_uuid
 from ..auth import get_password_hash
 from ..audit import log_action
 from ..policy import get_or_create_policy, validate_password
+import re
 from ..addressing import require_org_address
 from ..schemas import user_out, alias_out
+from ..rate_limit import limiter
 
 router = APIRouter(prefix="/users", tags=["Admin: Users"])
 
@@ -105,10 +107,16 @@ async def list_users(
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
+@limiter.limit("20/minute")
 async def create_user(body: UserCreate, request: Request,
                       admin: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
     if body.role != UserRole.MEMBER and admin.role != UserRole.SUPER_ADMIN:
         raise HTTPException(status_code=403, detail="Only a super admin can create administrators")
+        
+    local_part = body.email.split("@")[0] if "@" in body.email else body.email
+    if not re.match(r"^[a-zA-Z0-9](?:[a-zA-Z0-9._-]*[a-zA-Z0-9])?$", local_part):
+        raise HTTPException(status_code=400, detail="Invalid email username. It must not start or end with a dot or hyphen, and can only contain letters, numbers, dots, hyphens, and underscores.")
+        
     email = await require_org_address(db, admin.organization_id, body.email)
     policy = await get_or_create_policy(db, admin.organization_id)
     validate_password(policy, body.password)
