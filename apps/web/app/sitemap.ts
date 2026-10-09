@@ -1,26 +1,38 @@
-import { MetadataRoute } from 'next'
+﻿import { MetadataRoute } from 'next'
  
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://mailflow.example.com'; // Replace with actual production domain when ready
+  const baseUrl = 'https://mail.x010.tech';
   
   return [
     {
-      url: `${baseUrl}`,
+      url: ${baseUrl},
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: `${baseUrl}/login`,
+      url: ${baseUrl}/login,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/signup`,
+      url: ${baseUrl}/signup,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
+    },
+    {
+      url: ${baseUrl}/terms,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.5,
+    },
+    {
+      url: ${baseUrl}/privacy,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.5,
     },
   ]
 }
