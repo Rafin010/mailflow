@@ -13,7 +13,7 @@ __pycache__/
 venv/
 env/
 
-# Environment variables ----------=========Hello=========-----------
+# Environment variables 
 .env
 .env.local
 
