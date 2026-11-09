@@ -26,3 +26,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+
+  # Helllo ajai ra comite
